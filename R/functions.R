@@ -146,6 +146,7 @@ plotRateTree <- function(tree, rates,
                          scaled = F,
                          cols = NULL, bg = "white",
                          edge.width){
+  foo <- par()
   if(scaled){
     tree$edge.length <- tree$edge.length * tree$rates
   }
@@ -161,4 +162,5 @@ plotRateTree <- function(tree, rates,
        show.tip.label = F,
        edge.color = cols[as.factor(tree$rates)],
        edge.width = edge.width)
+  par(bg=foo$bg)
 }
