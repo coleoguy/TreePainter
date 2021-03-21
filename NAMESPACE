@@ -1,3 +1,4 @@
 export(treePaintR)
+export(plot.rateTree)
 importFrom(ape, Nedge)
 importFrom(castor, asr_mk_model)
