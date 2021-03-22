@@ -15,10 +15,10 @@ treePaintR(tree = NULL,
   \item{tree}{phylo object (strictly bifurcating)}
   \item{tip_states}{vector of tip states in same order as tips of the phylogeny}
   \item{qmat}{matrix of rates that describe the evolution of the trait of interest. These are expected to be the maximum likelihood rates estimated in a package like Geiger, APE, or Diversitree}
-  \iter{iter}{the number of iterations to perform. The default is 10,000.}
-  \iter{rate.class}{Number of rate classes, should be 3, 5, or 7.}
-  \iter{rates}{vector of rates that branches will be scaled by}
-  \iter{verbose}{If TRUE then various messages will be printed during the fitting process}
+  \item{iter}{the number of iterations to perform. The default is 10,000.}
+  \item{rate.class}{Number of rate classes, should be 3, 5, or 7.}
+  \item{rates}{vector of rates that branches will be scaled by}
+  \item{verbose}{If TRUE then various messages will be printed during the fitting process}
 }
 \details{}
 

@@ -11,6 +11,7 @@ treePaintR <- function(tree = NULL,
   # is iter sufficient
 
   # set rate classes
+  #TODO make this step better
   steps <- floor(rate.classes/2)
   bot <- 1/(1 + steps * step)
   top <- 1 + steps * step
@@ -107,6 +108,8 @@ getRates <- function(tree = NULL, edge = NULL, rate.classes = NULL){
   return(poss.rates)
 }
 
+# this function returns possible
+# rates of local branches
 getLocalRates <- function(tree = NULL, edge = NULL, rate.classes){
   # get parent edge
   p.edge <- which(tree$edge[, 2] == tree$edge[edge, 1])
@@ -127,6 +130,8 @@ getLocalRates <- function(tree = NULL, edge = NULL, rate.classes){
   return(unique(rates))
 }
 
+# this function returns possible
+# rates for a set of local rates
 getPossiRates <- function(local.rates = NULL, rate.classes = NULL){
   x <- c(-1, 0, 1)
   rate.mat <- as.data.frame(matrix(NA, 0, rate.classes))
@@ -142,7 +147,8 @@ getPossiRates <- function(local.rates = NULL, rate.classes = NULL){
   return(poss.rates)
 }
 
-plotRateTree <- function(tree, rates,
+# this function plots the tree painted/scaled by rate
+plot.rateTree <- function(tree, rates,
                          scaled = F,
                          cols = NULL, bg = "white",
                          edge.width){
