@@ -9,22 +9,22 @@ for(i in 1:100){
   trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
   #TODO add a step of creating variation in rates so far every
   #thing we are doing is a null result
-  traits[[i]] <- sim.character(tree = trees[[i]],
+  traits[[i]] <- as.vector(sim.character(tree = trees[[i]],
                                pars = qmat,
-                               model = "mkn",x0 = 2)
+                               model = "mkn",x0 = 2))
 }
 library(castor)
-
-
+tips <- get.descendants(179, trees[[1]])
+traits[[1]][tips] <- sample(1:2, length(tips), replace=T)
 fit3 <- treePaintR(tree = trees[[1]],
                   tip_states = traits[[1]],
                   qmat = qmat,
                   iter = 10000,
                   rate.classes = 13,
                   step = 9)
-plot(tree = fit[[1]],
+plot(tree = fit3[[1]],
      rates = 13,
-     scaled = T,
+     scaled = F,
      cols=NULL,
      bg="lightgray", edge.width = 1)
 plot(tree = fit2[[1]],
@@ -38,7 +38,7 @@ plot(tree = fit3[[1]],
      cols=NULL,
      bg="lightgray", edge.width = 1)
 
-plot(fit2$lk.trace, type = "l",
+plot(fit3$lk.trace, type = "l",
      ylab = "lnLik",
      xlab = "generation")
 lines(fit$lk.trace, type = "l",col="red")
