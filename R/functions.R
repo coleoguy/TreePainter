@@ -5,11 +5,105 @@ treePaintR <- function(tree = NULL,
                        rate.classes = NULL,
                        step = .5,
                        verbose = F){
+  # add checks
+  # checks related to the tree
+  # presence of tree
+  if(is.null(tree)){
+    stop("No imput tree")
+  }else{
+    # class of tree
+    if(!is.phylo(tree)){
+      stop("tree should class of 'Phylo'")
+    }
+    # bifurcation of tree
+    if(!is.binary(tree)){
+      stop("tree should be stricly bifurcating")
+    }
+    # rootedness
+    if(!is.rooted(tree)){
+      stop("tree should be rooted")
+    }
+  }
+  # checks related to tip states
+  # presence of tip states
+  if(is.null(tip_states)){
+    stop("tip states are missing")
+  }else{
+    # length of tip states should be equal to the number of tips
+    if(length(tip_states) != Ntip(tree)){
+      stop("length of tip states does not match with the number of tips")
+    }
+    # tip states should be integer
+    if(!is.numeric(tip_states)){
+      stop("tip states should integers")
+    }
+    # tip states should start from 1
+    if(min(range(tip_states)) != 1){
+      stop("Starting value of tip states should be 1")
+    }
+  }
+  # checks related to qmat
+  # presence of qmat
+  if(is.null(qmat)){
+    stop("missing Q matrix")
+  }else{
+    if(nrow(qmat) != ncol(qmat)){
+      stop("number of rows and columns in the Q Matrix does not match")
+    }
+    if(any(rowSums(qmat) != 0)){
+      stop(paste("row(s)", which(rowSums(qmat) != 0), "does not add up to zero"))
+    }
+  }
+  # checks related to iterations
+  # presence of iterations
+  if(is.null(iter)){
+    stop("iter is missing")
+  }else{
+    # iter should be single value
+    if(length(iter) > 1){
+      stop("iter should be single numeric value")
+    }
+    # iter should be positive
+    if(iter < 0){
+      stop("iter should be positive")
+    }
+    # iter should be numeric
+    if(!is.numeric(iter)){
+      stop("iter should be of class an integer")
+    }
+    # iter should not contain decimal values
+    if(iter %% 1 != 0){
+      stop("rate classes should not contain decimal values")
+    }
+  }
+  # checks related to rate class
+  # presence of rate class
+  if(is.null(rate.classes)){
+    stop("rate classes are missing")
+  }else{
+    # rate class should be single value
+    if(length(rate.classes) > 1){
+      stop("rate classes should be single numeric value")
+    }
+    # rate class should be positive
+    if(rate.classes < 0){
+      stop("rate class should be positive")
+    }
+    # rate class should be numeric
+    if(!is.numeric(rate.classes)){
+      stop("rate classes should be an integer")
+    }
+    # rate class should not contain decimal values
+    if(rate.classes %% 1 != 0){
+      stop("rate classes should not contain decimal values")
+    }
+  }
+  
   #TODO add some checks
   # is tree bifurcating
   # does qmat make sense
   # is iter sufficient
-
+  
   # set rate classes
   #TODO make this step better
   steps <- floor(rate.classes/2)
@@ -21,13 +115,13 @@ treePaintR <- function(tree = NULL,
              seq(from = 1,
                  to = top,
                  length.out = steps+1)[-1])
-
+  
   # add our new element to the tree
   tree$rates <- rep(ceiling(rate.classes/2),
                     Nedge(tree))
   # we will store the likelihood trace here
   lk.trace <- c()
-
+  
   # get the starting likelihood
   lk1 <- asr_mk_model(tree = tree, tip_states = tip_states,
                       transition_matrix = qmat,
@@ -72,8 +166,8 @@ testNewRate <- function(tree = NULL, tip_states = NULL,
   # evaluate and draw the possible rates we could
   # assign to the sampled branch
   poss.rate <- getRates(tree = tree,
-                       edge = edge,
-                       rate.classes = rate.classes)
+                        edge = edge,
+                        rate.classes = rate.classes)
   # only bother doing something if it a change
   if(poss.rate != tree$rates[edge]){
     # apply the new rate
@@ -149,9 +243,9 @@ getPossiRates <- function(local.rates = NULL, rate.classes = NULL){
 
 # this function plots the tree painted/scaled by rate
 plot.rateTree <- function(tree, rates,
-                         scaled = F,
-                         cols = NULL, bg = "white",
-                         edge.width){
+                          scaled = F,
+                          cols = NULL, bg = "white",
+                          edge.width){
   foo <- par()
   if(scaled){
     tree$edge.length <- tree$edge.length * tree$rates
