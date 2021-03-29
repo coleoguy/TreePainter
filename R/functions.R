@@ -12,7 +12,7 @@ treePaintR <- function(tree = NULL,
     stop("No imput tree")
   }else{
     # class of tree
-    if(!is.phylo(tree)){
+    if(class(tree) != "phylo"){
       stop("tree should class of 'Phylo'")
     }
     # bifurcation of tree
@@ -98,12 +98,12 @@ treePaintR <- function(tree = NULL,
       stop("rate classes should not contain decimal values")
     }
   }
-  
+
   #TODO add some checks
   # is tree bifurcating
   # does qmat make sense
   # is iter sufficient
-  
+
   # set rate classes
   #TODO make this step better
   steps <- floor(rate.classes/2)
@@ -115,13 +115,13 @@ treePaintR <- function(tree = NULL,
              seq(from = 1,
                  to = top,
                  length.out = steps+1)[-1])
-  
+
   # add our new element to the tree
   tree$rates <- rep(ceiling(rate.classes/2),
                     Nedge(tree))
   # we will store the likelihood trace here
   lk.trace <- c()
-  
+
   # get the starting likelihood
   lk1 <- asr_mk_model(tree = tree, tip_states = tip_states,
                       transition_matrix = qmat,
