@@ -30,32 +30,36 @@ for(i in 1:100){
                                model = "mkn",x0 = 2))
 }
 library(castor)
-fit3 <- treePaintR(tree = trees[[100]],
+fit <- treePaintR(tree = trees[[100]],
                   tip_states = traits[[100]],
                   qmat = qmat,
                   iter = 10000,
                   rate.classes = 3,
-                  step = 5)
-plot(tree = fit3[[1]],
-     rates = fit3$num.rates,
-     scaled = F,
-     cols=NULL,
-     bg="lightgray", edge.width = 1)
-plot(tree = fit2[[1]],
-     rates = 13,
+                  step = 2)
+plot(tree = fit[[1]],
+     rates = fit$num.rates,
      scaled = T,
      cols=NULL,
      bg="lightgray", edge.width = 1)
-plot(tree = fit3[[1]],
-     rates = 13,
-     scaled = T,
-     cols=NULL,
-     bg="lightgray", edge.width = 1)
+plot(sim.tree, show.tip.label = F)
+tiplabels(pch = 16, col = c("red", "blue")[traits[[100]]], cex = .5, offset = .01)
 
-plot(fit3$lk.trace, type = "l",
-     ylab = "lnLik",
-     xlab = "generation")
-lines(fit$lk.trace, type = "l",col="red")
-lines(fit3$lk.trace, type = "l",col="red")
+
+# plot(tree = fit2[[1]],
+#      rates = 13,
+#      scaled = T,
+#      cols=NULL,
+#      bg="lightgray", edge.width = 1)
+# plot(tree = fit3[[1]],
+#      rates = 13,
+#      scaled = T,
+#      cols=NULL,
+#      bg="lightgray", edge.width = 1)
+# 
+# plot(fit3$lk.trace, type = "l",
+#      ylab = "lnLik",
+#      xlab = "generation")
+# lines(fit$lk.trace, type = "l",col="red")
+# lines(fit3$lk.trace, type = "l",col="red")
 
 
