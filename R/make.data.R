@@ -24,7 +24,7 @@ for(i in 1:100){
     }
   }
   sim.tree <- trees[[i]]
-  sim.tree$edge.length[branches] <- sim.tree$edge.length[branches] * 2
+  sim.tree$edge.length[branches] <- sim.tree$edge.length[branches] * 5
   traits[[i]] <- as.vector(sim.character(tree = sim.tree,
                                pars = qmat,
                                model = "mkn",x0 = 2))
@@ -34,8 +34,8 @@ fit <- treePaintR(tree = trees[[100]],
                   tip_states = traits[[100]],
                   qmat = qmat,
                   iter = 10000,
-                  rate.classes = 3,
-                  step = 7)
+                  rate.classes = 13,
+                  step = 1)
 par(mfcol = c(1,2))
 plot(tree = fit[[1]],
      rates = fit$num.rates,
