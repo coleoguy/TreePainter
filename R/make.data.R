@@ -1,6 +1,6 @@
 library(diversitree)
 source("functions.R")
-qmat <- matrix(c(-.1,.1,.1,-.1), 2,2)
+qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
 trees <- traits <- list()
 fast.branches <- list()
 for(i in 1:100){
@@ -35,10 +35,11 @@ fit <- treePaintR(tree = trees[[100]],
                   qmat = qmat,
                   iter = 10000,
                   rate.classes = 3,
-                  step = 2)
+                  step = 7)
+par(mfcol = c(1,2))
 plot(tree = fit[[1]],
      rates = fit$num.rates,
-     scaled = T,
+     scaled = F,
      cols=NULL,
      bg="lightgray", edge.width = 1)
 plot(sim.tree, show.tip.label = F)
