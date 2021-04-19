@@ -12,7 +12,10 @@ for(i in 1:4){
   depth <- max(branching.times(trees[[i]]))
   trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
   working <- T
+  counter <- 0
   while(working){
+    print(counter + 1)
+    counter <- counter + 1
     hit <- sample(trees[[i]]$edge[,1], 1)
     tips <- get.descendants(node = hit,
                             tree = trees[[i]], tips.only = T)
@@ -43,7 +46,7 @@ dat <- as.data.frame(matrix(data = NA,
 
 colnames(dat) <- c("tree", "rep", "Ntips", "rateClasses", "stepSize", "scaler", "truePositives", "falsePositives")
 
-j <- 1
+counter <- 1
 for(m in 1:length(trees)){
   for(i in 1:reps){
     for(k in 1:length(rateClasses)){
@@ -66,14 +69,14 @@ for(m in 1:length(trees)){
             }
           }
           #fill the data table
-          dat$tree[j] <- paste("tree", m)
-          dat$rep[j] <- paste("rep", i)
-          dat$Ntips[j] <- Ntip(trees[[m]])
-          dat$rateClasses[j] <- rateClasses[k]
-          dat$stepSize[j] <- stepSize[l]
-          dat$scaler[j] <- scaler[n]
+          dat$tree[counter] <- paste("tree", m)
+          dat$rep[counter] <- paste("rep", i)
+          dat$Ntips[counter] <- Ntip(trees[[m]])
+          dat$rateClasses[counter] <- rateClasses[k]
+          dat$stepSize[counter] <- stepSize[l]
+          dat$scaler[counter] <- scaler[n]
           # print iteration
-          print(paste("iteration", j))
+          print(paste("iteration", counter))
           # fit model
           fit <- treePaintR(tree = trees[[m]],
                             tip_states = traits[[m]],
@@ -160,7 +163,7 @@ for(i in 1:4){
        ylab = "True positive",
        pch = 16,
        col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-  
+
   ## rate classes vs false positives
   plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)], .6),
        y = jitter(dat$falsePositives[dat$tree == paste("tree", i)],2),
@@ -168,7 +171,7 @@ for(i in 1:4){
        ylab = "False positive",
        pch = 16,
        col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-  
+
   ## step size vs true positives
   plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
        y = jitter(dat$truePositives[dat$tree == paste("tree", i)], 2),
@@ -176,7 +179,7 @@ for(i in 1:4){
        ylab = "True positive",
        pch = 16,
        col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-  
+
   ## step size vs false positives
   plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
        y = jitter(dat$falsePositives[dat$tree == paste("tree", i)], 2),
@@ -200,4 +203,3 @@ ggplot(dat, aes(y=truePositives, x=stepSize)) + geom_point(aes(colour=as.factor(
 # fp vs ss
 ggplot(dat, aes(y=falsePositives, x=stepSize)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("stepSize") + ylab("falsePositives")
 
-     
