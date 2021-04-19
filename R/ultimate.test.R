@@ -31,72 +31,76 @@ for(i in 1:4){
 library(castor)
 
 # test in model performance / over fitting
+# number of rate classes
 rateClasses <- seq(from = 3, to = 21, by = 2)
+# step size
 stepSize <- seq(from = 1, to = 30, by = 2)
+# number of repetitions
 reps <- 5
+# scaler parameter to increase the branch length
 scaler <- c(2,5,25,100)
 
-# # get a single tree and traits
-# tree <- trees[[i]]
-# trait <- traits[[i]]
-
+# make a data table to hold all the parameters of interest
 dat <- as.data.frame(matrix(data = NA,
                             nrow = length(trees) * reps * length(rateClasses) * length(stepSize) * length(scaler),
                             ncol = 8))
-
+# give column names
 colnames(dat) <- c("tree", "rep", "Ntips", "rateClasses", "stepSize", "scaler", "truePositives", "falsePositives")
 
+# make a counter
 counter <- 1
-for(m in 1:length(trees)){
-  for(i in 1:reps){
+# run the analysis
+for(i in 1:length(trees)){
+  for(j in 1:reps){
     for(k in 1:length(rateClasses)){
       for(l in 1:length(stepSize)){
-        for(n in 1: length(scaler)){
-          sim.tree <- trees[[m]]
-          sim.tree$edge.length[branches] <- sim.tree$edge.length[branches] * scaler[n]
-          traits[[m]] <- as.vector(sim.character(tree = sim.tree,
+        for(m in 1: length(scaler)){
+          # simulate a fast evolving clade
+          sim.tree <- trees[[i]]
+          sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[i]]] * scaler[m]
+          traits[[i]] <- as.vector(sim.character(tree = sim.tree,
                                                  pars = qmat,
                                                  model = "mkn",x0 = 2))
-          if(length(unique(traits[[m]])) == 1){
+          # make sure that two traits are present
+          if(length(unique(traits[[i]])) == 1){
             working <- T
             while (working) {
-              traits[[m]] <- as.vector(sim.character(tree = sim.tree,
+              traits[[i]] <- as.vector(sim.character(tree = sim.tree,
                                                      pars = qmat,
                                                      model = "mkn",x0 = 2))
-              if(length(unique(traits[[m]])) == 2){
+              if(length(unique(traits[[i]])) == 2){
                 working <- F
               }
             }
           }
           #fill the data table
-          dat$tree[counter] <- paste("tree", m)
-          dat$rep[counter] <- paste("rep", i)
-          dat$Ntips[counter] <- Ntip(trees[[m]])
+          dat$tree[counter] <- paste("tree", i)
+          dat$rep[counter] <- paste("rep", j)
+          dat$Ntips[counter] <- Ntip(trees[[i]])
           dat$rateClasses[counter] <- rateClasses[k]
           dat$stepSize[counter] <- stepSize[l]
-          dat$scaler[counter] <- scaler[n]
+          dat$scaler[counter] <- scaler[m]
           # print iteration
           print(paste("iteration", counter))
           # fit model
-          fit <- treePaintR(tree = trees[[m]],
-                            tip_states = traits[[m]],
+          fit <- treePaintR(tree = trees[[i]],
+                            tip_states = traits[[i]],
                             qmat = qmat,
                             iter = 6000,
                             rate.classes = rateClasses[k],
                             step = stepSize[l])
           # true positives
-          tp <- sum(fit$tree$rates[fast.branches[[m]]] > median(1:fit$num.rates)) / length(fast.branches[[m]])
+          tp <- sum(fit$tree$rates[fast.branches[[i]]] > median(1:fit$num.rates)) / length(fast.branches[[i]])
           # false positives
-          fp <- sum(fit$tree$rates[-fast.branches[[m]]] > median(1:fit$num.rates)) / length(fit$tree$rates[-fast.branches[[m]]])
+          fp <- sum(fit$tree$rates[-fast.branches[[i]]] > median(1:fit$num.rates)) / length(fit$tree$rates[-fast.branches[[i]]])
           dat$truePositives[j] <- tp
           dat$falsePositives[j] <- fp
           # counter
-          j <- j+1
+          counter <- counter+1
         }
       }
     }
   }
-  print(paste("rep", i, "complete"))
 }
 
 par(mfcol = c(2,2))
