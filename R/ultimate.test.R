@@ -93,8 +93,8 @@ for(i in 1:length(trees)){
           tp <- sum(fit$tree$rates[fast.branches[[i]]] > median(1:fit$num.rates)) / length(fast.branches[[i]])
           # false positives
           fp <- sum(fit$tree$rates[-fast.branches[[i]]] > median(1:fit$num.rates)) / length(fit$tree$rates[-fast.branches[[i]]])
-          dat$truePositives[j] <- tp
-          dat$falsePositives[j] <- fp
+          dat$truePositives[counter] <- tp
+          dat$falsePositives[counter] <- fp
           # counter
           counter <- counter+1
         }
