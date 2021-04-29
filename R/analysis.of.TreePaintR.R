@@ -1,10 +1,11 @@
 library(diversitree)
 source("functions.R")
 qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
+nTrees <- 1
 trees <- traits <- list()
 fast.branches <- list()
-ntips <- c(50, 100, 150, 200)
-for(i in 1:4){
+ntips <- c(200)
+for(i in 1:nTrees){
   trees[[i]] <- trees(pars=c(3,1),
                       type="bd",
                       max.taxa = ntips[i])[[1]]
@@ -36,13 +37,13 @@ rateClasses <- seq(from = 3, to = 21, by = 2)
 # step size
 stepSize <- seq(from = 1, to = 30, by = 2)
 # number of repetitions
-reps <- 5
+reps <- 50
 # scaler parameter to increase the branch length
-scaler <- c(2,5,25,100)
+scaler <- c(5)
 
 # make a data table to hold all the parameters of interest
 dat <- as.data.frame(matrix(data = NA,
-                            nrow = length(trees) * reps * length(rateClasses) * length(stepSize) * length(scaler),
+                            nrow = length(nTrees) * reps * length(rateClasses) * length(stepSize) * length(scaler),
                             ncol = 8))
 # give column names
 colnames(dat) <- c("tree", "rep", "Ntips", "rateClasses", "stepSize", "scaler", "truePositives", "falsePositives")
@@ -50,7 +51,7 @@ colnames(dat) <- c("tree", "rep", "Ntips", "rateClasses", "stepSize", "scaler", 
 # make a counter
 counter <- 1
 # run the analysis
-for(i in 1:length(trees)){
+for(i in 1:length(nTrees)){
   for(j in 1:reps){
     for(k in 1:length(rateClasses)){
       for(l in 1:length(stepSize)){
@@ -81,12 +82,14 @@ for(i in 1:length(trees)){
           dat$stepSize[counter] <- stepSize[l]
           dat$scaler[counter] <- scaler[m]
           # print iteration
-          print(paste("iteration", counter))
+          if(j %% 500 == 0){
+            cat(j, "\n")
+          }
           # fit model
           fit <- treePaintR(tree = trees[[i]],
                             tip_states = traits[[i]],
                             qmat = qmat,
-                            iter = 6000,
+                            iter = 10000,
                             rate.classes = rateClasses[k],
                             step = stepSize[l])
           # true positives
