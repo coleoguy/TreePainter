@@ -39,7 +39,7 @@ stepSize <- seq(from = 1, to = 30, by = 2)
 # number of repetitions
 reps <- 50
 # scaler parameter to increase the branch length
-scaler <- c(5)
+scaler <- c(10)
 
 # make a data table to hold all the parameters of interest
 dat <- as.data.frame(matrix(data = NA,
@@ -82,8 +82,8 @@ for(i in 1:length(nTrees)){
           dat$stepSize[counter] <- stepSize[l]
           dat$scaler[counter] <- scaler[m]
           # print iteration
-          if(j %% 500 == 0){
-            cat(j, "\n")
+          if(counter %% 500 == 0){
+            cat(counter, "\n")
           }
           # fit model
           fit <- treePaintR(tree = trees[[i]],
@@ -106,107 +106,109 @@ for(i in 1:length(nTrees)){
   }
 }
 
-par(mfcol = c(2,2))
+save.image("../R/analysis.of.TreePaintR.scaler.10.RData")
 
-# plot
-## rate classes vs true positives
-plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)],.6),
-     y = jitter(dat$truePositivesdat$tree == paste("tree", i),2),
-     xlab = "Rate class",
-     ylab = "True positive",
-     pch = 16,
-     col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-
-## rate classes vs false positives
-plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)], .6),
-     y = jitter(dat$falsePositives[dat$tree == paste("tree", i)],2),
-     xlab = "Rate class",
-     ylab = "False positive",
-     pch = 16,
-     col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-
-## step size vs true positives
-plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
-     y = jitter(dat$truePositives[dat$tree == paste("tree", i)], 2),
-     xlab = "Step size",
-     ylab = "True positive",
-     pch = 16,
-     col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-
-## step size vs false positives
-plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
-     y = jitter(dat$falsePositives[dat$tree == paste("tree", i)], 2),
-     xlab = "Step size",
-     ylab = "False positive",
-     pch = 16,
-     col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])],
-     cex = 1)
-
-fit <- treePaintR(tree = tree,
-                  tip_states = trait,
-                  qmat = qmat,
-                  iter = 10000,
-                  rate.classes = dat$rateClasses[which.max(dat$truePositives)],
-                  step = dat$stepSize[which.max(dat$truePositives)])
-
-par(mfcol = c(1,2))
-plot(tree = fit[[1]],
-     rates = fit$num.rates,
-     scaled = F,
-     cols=NULL,
-     bg="lightgray", edge.width = 1)
-plot(sim.tree, show.tip.label = F)
-tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
-
-
-
-
-for(i in 1:4){
-  # plot
-  ## rate classes vs true positives
-  plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)],.6),
-       y = jitter(dat$truePositives[dat$tree == paste("tree", i)],2),
-       xlab = "Rate class",
-       ylab = "True positive",
-       pch = 16,
-       col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-
-  ## rate classes vs false positives
-  plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)], .6),
-       y = jitter(dat$falsePositives[dat$tree == paste("tree", i)],2),
-       xlab = "Rate class",
-       ylab = "False positive",
-       pch = 16,
-       col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-
-  ## step size vs true positives
-  plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
-       y = jitter(dat$truePositives[dat$tree == paste("tree", i)], 2),
-       xlab = "Step size",
-       ylab = "True positive",
-       pch = 16,
-       col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
-
-  ## step size vs false positives
-  plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
-       y = jitter(dat$falsePositives[dat$tree == paste("tree", i)], 2),
-       xlab = "Step size",
-       ylab = "False positive",
-       pch = 16,
-       col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])],
-       cex = 1)
-}
-
-library(ggplot2)
-#tp vs rc
-ggplot(dat, aes(y=truePositives, x=rateClasses)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("rateClasses") + ylab("truePositives")
-
-#fp vs rc
-ggplot(dat, aes(y=falsePositives, x=rateClasses)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("rateClasses") + ylab("falsePositives")
-
-# tp vs ss
-ggplot(dat, aes(y=truePositives, x=stepSize)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("stepSize") + ylab("truePositives")
-
-# fp vs ss
-ggplot(dat, aes(y=falsePositives, x=stepSize)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("stepSize") + ylab("falsePositives")
-
+# par(mfcol = c(2,2))
+# 
+# # plot
+# ## rate classes vs true positives
+# plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)],.6),
+#      y = jitter(dat$truePositivesdat$tree == paste("tree", i),2),
+#      xlab = "Rate class",
+#      ylab = "True positive",
+#      pch = 16,
+#      col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
+# 
+# ## rate classes vs false positives
+# plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)], .6),
+#      y = jitter(dat$falsePositives[dat$tree == paste("tree", i)],2),
+#      xlab = "Rate class",
+#      ylab = "False positive",
+#      pch = 16,
+#      col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
+# 
+# ## step size vs true positives
+# plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
+#      y = jitter(dat$truePositives[dat$tree == paste("tree", i)], 2),
+#      xlab = "Step size",
+#      ylab = "True positive",
+#      pch = 16,
+#      col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
+# 
+# ## step size vs false positives
+# plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
+#      y = jitter(dat$falsePositives[dat$tree == paste("tree", i)], 2),
+#      xlab = "Step size",
+#      ylab = "False positive",
+#      pch = 16,
+#      col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])],
+#      cex = 1)
+# 
+# fit <- treePaintR(tree = tree,
+#                   tip_states = trait,
+#                   qmat = qmat,
+#                   iter = 10000,
+#                   rate.classes = dat$rateClasses[which.max(dat$truePositives)],
+#                   step = dat$stepSize[which.max(dat$truePositives)])
+# 
+# par(mfcol = c(1,2))
+# plot(tree = fit[[1]],
+#      rates = fit$num.rates,
+#      scaled = F,
+#      cols=NULL,
+#      bg="lightgray", edge.width = 1)
+# plot(sim.tree, show.tip.label = F)
+# tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
+# 
+# 
+# 
+# 
+# for(i in 1:4){
+#   # plot
+#   ## rate classes vs true positives
+#   plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)],.6),
+#        y = jitter(dat$truePositives[dat$tree == paste("tree", i)],2),
+#        xlab = "Rate class",
+#        ylab = "True positive",
+#        pch = 16,
+#        col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
+# 
+#   ## rate classes vs false positives
+#   plot(x = jitter(dat$rateClasses[dat$tree == paste("tree", i)], .6),
+#        y = jitter(dat$falsePositives[dat$tree == paste("tree", i)],2),
+#        xlab = "Rate class",
+#        ylab = "False positive",
+#        pch = 16,
+#        col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
+# 
+#   ## step size vs true positives
+#   plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
+#        y = jitter(dat$truePositives[dat$tree == paste("tree", i)], 2),
+#        xlab = "Step size",
+#        ylab = "True positive",
+#        pch = 16,
+#        col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])])
+# 
+#   ## step size vs false positives
+#   plot(x = jitter(dat$stepSize[dat$tree == paste("tree", i)], .6),
+#        y = jitter(dat$falsePositives[dat$tree == paste("tree", i)], 2),
+#        xlab = "Step size",
+#        ylab = "False positive",
+#        pch = 16,
+#        col = rainbow(reps,alpha = .5)[as.factor(dat$rep[dat$tree == paste("tree", i)])],
+#        cex = 1)
+# }
+# 
+# library(ggplot2)
+# #tp vs rc
+# ggplot(dat, aes(y=truePositives, x=rateClasses)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("rateClasses") + ylab("truePositives")
+# 
+# #fp vs rc
+# ggplot(dat, aes(y=falsePositives, x=rateClasses)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("rateClasses") + ylab("falsePositives")
+# 
+# # tp vs ss
+# ggplot(dat, aes(y=truePositives, x=stepSize)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("stepSize") + ylab("truePositives")
+# 
+# # fp vs ss
+# ggplot(dat, aes(y=falsePositives, x=stepSize)) + geom_point(aes(colour=as.factor(Ntips)), stat="identity", position="jitter", alpha=0.7, size=1) + facet_grid(rep ~ scaler) + theme_grey() + theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + scale_size(range=c(1, 2)) + guides(colour=guide_legend(title="Ntips")) + xlab("stepSize") + ylab("falsePositives")
+# 

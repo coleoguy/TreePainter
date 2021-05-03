@@ -1,6 +1,6 @@
 
 #load data 
-load("analysis.of.TreePaintR.v.2.RData")
+load("analysis.of.TreePaintR.scaler.5.RData")
 # remove unwanted data
 rm(list = ls()[-3])
 
