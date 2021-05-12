@@ -28,7 +28,8 @@ filled.contour(x = RateClass,
                plot.title = title(main = "True positives",
                                   xlab = "Rate Class", ylab = "Step size"),
                key.title = title(main = "% of\n True positives",cex.main = .7),
-               color = function(n) hcl.colors(n, "viridis"))
+               color = function(n) hcl.colors(n, "viridis"),
+               levels = pretty(range(TruePositives * 100, FalsePositives * 100),20))
 
 filled.contour(x = RateClass, 
                y = StepSize, 
@@ -36,7 +37,8 @@ filled.contour(x = RateClass,
                plot.title = title(main = "False positives",
                                   xlab = "Rate Class", ylab = "Step size"),
                key.title = title(main = "% of\n False positives",cex.main = .7),
-               color = function(n) hcl.colors(n, "viridis"))
+               color = function(n) hcl.colors(n, "viridis"),
+               levels = pretty(range(TruePositives * 100, FalsePositives * 100),20))
 
 
 
