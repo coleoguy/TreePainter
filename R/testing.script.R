@@ -1,3 +1,7 @@
+library(diversitree)
+library(castor)
+source("functions.R")
+
 qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
 nTrees <- 1
 trees <- traits <- list()
@@ -30,16 +34,23 @@ for(i in 1:nTrees){
 
 sim.tree <- trees[[i]]
 sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[i]]] * 5
-traits[[i]] <- as.vector(sim.character(tree = sim.tree,
-                                       pars = qmat,
-                                       model = "mkn",x0 = 2))
+# traits[[i]] <- as.vector(sim.character(tree = sim.tree,
+#                                        pars = qmat,
+#                                        model = "mkn",x0 = 2))
+
+traits[[i]] <- simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
+
+# simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
+
 # make sure that two traits are present
 if(length(unique(traits[[i]])) == 1){
   working <- T
   while (working) {
-    traits[[i]] <- as.vector(sim.character(tree = sim.tree,
-                                           pars = qmat,
-                                           model = "mkn",x0 = 2))
+    # traits[[i]] <- as.vector(sim.character(tree = sim.tree,
+    #                                        pars = qmat,
+    #                                        model = "mkn",x0 = 2))
+    
+    traits[[i]] <- simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
     if(length(unique(traits[[i]])) == 2){
       working <- F
     }
@@ -49,22 +60,24 @@ if(length(unique(traits[[i]])) == 1){
 plot(sim.tree, show.tip.label = F)
 tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
 
+plot(x = NULL, y = NULL,
+     xlim = c(1,10000),
+     ylim = c(-90,-70))
 
 
+for(j in 1:20){
 x <- treePaintR(tree = trees[[i]],
            tip_states = traits[[i]],
            qmat = qmat,
            iter = 500,
-           rate.classes = 11,
-           step = 0.5,iter.check = T,
-           iter.check.interval = 500.6)
-
-plot(x = NULL, y = NULL,
-     xlim = c(1,length(x$lk.trace)),
-     ylim = c(min(x$lk.trace),max(x$lk.trace)))
+           rate.classes = 5,
+           step = 0.1,iter.check = T,
+           iter.check.interval = 1000)
+lines(x$lk.trace, col = rainbow(20)[j])
+}
 
 
-lines(x$lk.trace, col = "red")
+
 
 plot.rateTree(x$tree, rates = x$num.rates,edge.width = 1, scaled = F)
 hist(x$tree$rates)
@@ -92,7 +105,7 @@ tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
 plot(sim.tree, show.tip.label = F)
 tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
 RC <- 7
-SS <- 5
+SS <- 0.5
 
 {
   steps <- floor(RC/2)
