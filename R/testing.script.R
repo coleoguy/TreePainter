@@ -12,8 +12,8 @@ for(i in 1:nTrees){
                       type="bd",
                       max.taxa = ntips[i])[[1]]
   # scale tree to unit length
- # depth <- max(branching.times(trees[[i]]))
-#  trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
+  depth <- max(branching.times(trees[[i]]))
+  trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
   working <- T
   counter <- 0
   while(working){
@@ -33,7 +33,7 @@ for(i in 1:nTrees){
 }
 
 sim.tree <- trees[[i]]
-sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[i]]] * 5
+sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[i]]] * 2
 # traits[[i]] <- as.vector(sim.character(tree = sim.tree,
 #                                        pars = qmat,
 #                                        model = "mkn",x0 = 2))
@@ -62,18 +62,18 @@ tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
 
 plot(x = NULL, y = NULL,
      xlim = c(1,10000),
-     ylim = c(-90,-70))
+     ylim = c(-90,-20))
 
 
 for(j in 1:20){
-x <- treePaintR(tree = trees[[i]],
-           tip_states = traits[[i]],
-           qmat = qmat,
-           iter = 500,
-           rate.classes = 5,
-           step = 0.1,iter.check = T,
-           iter.check.interval = 1000)
-lines(x$lk.trace, col = rainbow(20)[j])
+  x <- treePaintR(tree = trees[[i]],
+                  tip_states = traits[[i]],
+                  qmat = qmat,
+                  iter = 500,
+                  rate.classes = 5,
+                  step = 1,iter.check = T,
+                  iter.check.interval = 1000)
+  lines(x$lk.trace, col = rainbow(20)[j])
 }
 
 
@@ -109,14 +109,14 @@ SS <- 0.5
 
 {
   steps <- floor(RC/2)
-bot <- 1/(1 + steps * SS)
-top <- 1 + steps * SS
-rates <- c(seq(from = bot,
-               to = 1,
-               length.out = steps+1),
-           seq(from = 1,
-               to = top,
-               length.out = steps+1)[-1])
+  bot <- 1/(1 + steps * SS)
+  top <- 1 + steps * SS
+  rates <- c(seq(from = bot,
+                 to = 1,
+                 length.out = steps+1),
+             seq(from = 1,
+                 to = top,
+                 length.out = steps+1)[-1])
 }
 rates
 plot(rates)
