@@ -2,7 +2,7 @@ library(diversitree)
 library(castor)
 source("suggessions.R")
 
-qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
+qmat <- matrix(c(-.5,.5,.5,-.5), 2,2)
 nTrees <- 1
 trees <- traits <- list()
 fast.branches <- list()
@@ -59,25 +59,33 @@ if(length(unique(traits[[i]])) == 1){
 
 plot(sim.tree, show.tip.label = F)
 tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
-
-plot(x = NULL, y = NULL,
-     xlim = c(1,10000),
-     ylim = c(-90,-20))
-
-
-for(j in 1:20){
-  x <- treePaintR(tree = trees[[i]],
-                  tip_states = traits[[i]],
-                  qmat = qmat,
-                  iter = 500,
-                  rate.classes = 17,
-                  step = 0.01,iter.check = T,
-                  iter.check.interval = 1000)
-  lines(x$lk.trace, col = rainbow(20)[j])
-}
+# 
+# plot(x = NULL, y = NULL,
+#      xlim = c(1,10000),
+#      ylim = c(-90,-20))
 
 
+# for(j in 1:20){
+#   x <- treePaintR(tree = trees[[i]],
+#                   tip_states = traits[[i]],
+#                   qmat = qmat,
+#                   iter = 500,
+#                   rate.classes = 17,
+#                   step = 0.01,iter.check = T,
+#                   iter.check.interval = 1000)
+#   lines(x$lk.trace, col = rainbow(20)[j])
+# }
 
+
+
+
+x <- treePaintR(tree = trees[[i]],
+                tip_states = traits[[i]],
+                qmat = qmat,
+                iter = 500,
+                rate.classes = 7,
+                step = 0.5,iter.check = T,
+                iter.check.interval = 1000)
 
 plot.rateTree(x$tree, rates = x$num.rates,edge.width = 1, scaled = F)
 hist(x$tree$rates)
@@ -95,28 +103,28 @@ fh
 fl
 
 
-col <- rep("black",Nedge(trees[[1]]))
-col[x$tree$rates > median(1:x$num.rates)] <- "red"
-col[x$tree$rates == median(1:x$num.rates)] <- "black"
-col[x$tree$rates < median(1:x$num.rates)] <- "blue"
-
-plot(trees[[1]], edge.color = col, show.tip.label = F)
-tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
-plot(sim.tree, show.tip.label = F)
-tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
-RC <- 5
-SS <- 5
-
-{
-  steps <- floor(RC/2)
-  bot <- 1/(1 + steps * SS)
-  top <- 1 + steps * SS
-  rates <- c(seq(from = bot,
-                 to = 1,
-                 length.out = steps+1),
-             seq(from = 1,
-                 to = top,
-                 length.out = steps+1)[-1])
-}
-rates
-plot(rates)
+# col <- rep("black",Nedge(trees[[1]]))
+# col[x$tree$rates > median(1:x$num.rates)] <- "red"
+# col[x$tree$rates == median(1:x$num.rates)] <- "black"
+# col[x$tree$rates < median(1:x$num.rates)] <- "blue"
+# 
+# plot(trees[[1]], edge.color = col, show.tip.label = F)
+# tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
+# plot(sim.tree, show.tip.label = F)
+# tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
+# RC <- 5
+# SS <- 5
+# 
+# {
+#   steps <- floor(RC/2)
+#   bot <- 1/(1 + steps * SS)
+#   top <- 1 + steps * SS
+#   rates <- c(seq(from = bot,
+#                  to = 1,
+#                  length.out = steps+1),
+#              seq(from = 1,
+#                  to = top,
+#                  length.out = steps+1)[-1])
+# }
+# rates
+# plot(rates)
