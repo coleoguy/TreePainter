@@ -1,6 +1,6 @@
 library(diversitree)
 library(castor)
-source("functions.R")
+source("suggessions.R")
 
 qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
 nTrees <- 1
@@ -12,8 +12,8 @@ for(i in 1:nTrees){
                       type="bd",
                       max.taxa = ntips[i])[[1]]
   # scale tree to unit length
-  depth <- max(branching.times(trees[[i]]))
-  trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
+  # depth <- max(branching.times(trees[[i]]))
+  # trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
   working <- T
   counter <- 0
   while(working){
@@ -33,7 +33,7 @@ for(i in 1:nTrees){
 }
 
 sim.tree <- trees[[i]]
-sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[i]]] * 2
+sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[i]]] * 5
 # traits[[i]] <- as.vector(sim.character(tree = sim.tree,
 #                                        pars = qmat,
 #                                        model = "mkn",x0 = 2))
@@ -70,8 +70,8 @@ for(j in 1:20){
                   tip_states = traits[[i]],
                   qmat = qmat,
                   iter = 500,
-                  rate.classes = 5,
-                  step = 1,iter.check = T,
+                  rate.classes = 17,
+                  step = 0.01,iter.check = T,
                   iter.check.interval = 1000)
   lines(x$lk.trace, col = rainbow(20)[j])
 }
@@ -104,8 +104,8 @@ plot(trees[[1]], edge.color = col, show.tip.label = F)
 tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
 plot(sim.tree, show.tip.label = F)
 tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
-RC <- 7
-SS <- 0.5
+RC <- 5
+SS <- 5
 
 {
   steps <- floor(RC/2)
