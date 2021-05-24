@@ -2,7 +2,7 @@ library(diversitree)
 library(castor)
 source("suggessions.R")
 
-qmat <- matrix(c(-.5,.5,.5,-.5), 2,2)
+qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
 nTrees <- 1
 trees <- traits <- list()
 fast.branches <- list()
@@ -59,10 +59,10 @@ if(length(unique(traits[[i]])) == 1){
 
 plot(sim.tree, show.tip.label = F)
 tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
-# 
-# plot(x = NULL, y = NULL,
-#      xlim = c(1,10000),
-#      ylim = c(-90,-20))
+
+plot(x = NULL, y = NULL,
+     xlim = c(1,10000),
+     ylim = c(-90,-20))
 
 
 # for(j in 1:20){
@@ -83,8 +83,8 @@ x <- treePaintR(tree = trees[[i]],
                 tip_states = traits[[i]],
                 qmat = qmat,
                 iter = 500,
-                rate.classes = 7,
-                step = 0.5,iter.check = T,
+                rate.classes = 5,
+                step = 0.1,iter.check = T,
                 iter.check.interval = 1000)
 
 plot.rateTree(x$tree, rates = x$num.rates,edge.width = 1, scaled = F)
