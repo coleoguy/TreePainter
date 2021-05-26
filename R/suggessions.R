@@ -6,7 +6,8 @@ treePaintR <- function(tree = NULL,
                        step = .5,
                        verbose = F,
                        iter.check = NULL,
-                       iter.check.interval = NULL){
+                       iter.check.interval = NULL,
+                       root_prior = NULL){
   # do the checks
   # add checks
   # checks related to the tree
@@ -144,9 +145,13 @@ treePaintR <- function(tree = NULL,
   lk.trace <- c()
   
   # get the starting likelihood
-  lk1 <- asr_mk_model(tree = tree, tip_states = tip_states,
-                      transition_matrix = qmat,
-                      Nstates = ncol(qmat))$loglikelihood
+  mk_start_tree <- asr_mk_model(tree = tree, tip_states = tip_states,
+                                transition_matrix = qmat,
+                                Nstates = ncol(qmat),
+                                root_prior = root_prior)
+  
+  lk1 <- mk_start_tree$loglikelihood
+  root <- mk_start_tree$ancestral_likelihoods[1,]
   # this will be the primary loop
   for(j in 1:iter){
     if(verbose == T){
@@ -160,7 +165,8 @@ treePaintR <- function(tree = NULL,
                           transition_matrix = qmat,
                           Nstates = ncol(qmat),
                           rate.classes = rate.classes,
-                          rates = rates, lk1 = lk1)
+                          rates = rates, lk1 = lk1,
+                          root_prior = root)
     if(length(result) > 0){
       tree <- result[[1]]
       lk1 <- result[[2]]
@@ -182,7 +188,7 @@ treePaintR <- function(tree = NULL,
                               transition_matrix = qmat,
                               Nstates = ncol(qmat),
                               rate.classes = rate.classes,
-                              rates = rates, lk1 = lk1)
+                              rates = rates, lk1 = lk1,root_prior = root)
         if(length(result) > 0){
           tree <- result[[1]]
           lk1 <- result[[2]]
@@ -214,7 +220,8 @@ treePaintR <- function(tree = NULL,
 
 testNewRate <- function(tree = NULL, tip_states = NULL,
                         transition_matrix = NULL, Nstates = NULL,
-                        rate.classes = NULL, rates = NULL, lk1 = NULL){
+                        rate.classes = NULL, rates = NULL, lk1 = NULL,
+                        root_prior = NULL){
   # create a temp tree
   temp.tree <- tree
   # sample an edge at random
@@ -235,7 +242,8 @@ testNewRate <- function(tree = NULL, tip_states = NULL,
     lk2 <- asr_mk_model(tree = temp.tree,
                         tip_states = tip_states,
                         transition_matrix = transition_matrix,
-                        Nstates = Nstates)$loglikelihood
+                        Nstates = Nstates,
+                        root_prior = root_prior)$loglikelihood
     # see if the new rate is better
     if(lk2 > lk1){
       tree$rates <- temp.tree$rates
