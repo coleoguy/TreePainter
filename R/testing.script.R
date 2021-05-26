@@ -88,7 +88,7 @@ x <- treePaintR(tree = trees[[i]],
                 qmat = qmat,
                 iter = 500,
                 rate.classes = 11,
-                step = .1,iter.check = T,
+                step = .5,iter.check = T,
                 iter.check.interval = 1000,
                 root_prior = "empirical")
 
