@@ -1,5 +1,6 @@
 library(diversitree)
 library(castor)
+library(chromePlus)
 source("suggessions.R")
 
 qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
@@ -12,8 +13,8 @@ for(i in 1:nTrees){
                       type="bd",
                       max.taxa = ntips[i])[[1]]
   # scale tree to unit length
-  # depth <- max(branching.times(trees[[i]]))
-  # trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
+   # depth <- max(branching.times(trees[[i]]))
+   # trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
   working <- T
   counter <- 0
   while(working){
@@ -57,12 +58,14 @@ if(length(unique(traits[[i]])) == 1){
   }
 }
 
+par(mfcol = c(1,2))
+
 plot(sim.tree, show.tip.label = F)
 tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
 
-plot(x = NULL, y = NULL,
-     xlim = c(1,10000),
-     ylim = c(-90,-20))
+# plot(x = NULL, y = NULL,
+#      xlim = c(1,10000),
+#      ylim = c(-90,-20))
 
 
 # for(j in 1:20){
@@ -76,25 +79,29 @@ plot(x = NULL, y = NULL,
 #   lines(x$lk.trace, col = rainbow(20)[j])
 # }
 
-
-
+# 
+#  depth <- max(branching.times(trees[[i]]))
+#  trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
 
 x <- treePaintR(tree = trees[[i]],
                 tip_states = traits[[i]],
                 qmat = qmat,
                 iter = 500,
-                rate.classes = 5,
-                step = 0.1,iter.check = T,
-                iter.check.interval = 1000)
+                rate.classes = 11,
+                step = .1,iter.check = T,
+                iter.check.interval = 1000,
+                root_prior = "empirical")
+
+# plot(x$lk.trace, type = "l")
 
 plot.rateTree(x$tree, rates = x$num.rates,edge.width = 1, scaled = F)
-hist(x$tree$rates)
+# hist(x$tree$rates)
 
 # true positives
-th <- sum(x$tree$rates[fast.branches[[i]]]> median(1:x$num.rates)) / length(fast.branches[[i]])
+th <- sum(x$tree$rates[fast.branches[[i]]]>= median(1:x$num.rates)) / length(fast.branches[[i]])
 tl <- sum(x$tree$rates[-fast.branches[[i]]] < median(1:x$num.rates)) / length(x$tree$rates[-fast.branches[[i]]])
 # false positives
-fh <- sum(x$tree$rates[-fast.branches[[i]]] > median(1:x$num.rates)) / length(x$tree$rates[-fast.branches[[i]]])
+fh <- sum(x$tree$rates[-fast.branches[[i]]] >= median(1:x$num.rates)) / length(x$tree$rates[-fast.branches[[i]]])
 fl <- sum(x$tree$rates[fast.branches[[i]]] < median(1:x$num.rates)) / length(fast.branches[[i]])
 
 th
@@ -128,3 +135,11 @@ fl
 # }
 # rates
 # plot(rates)
+
+
+asr_mk_model(tree = trees[[1]],
+             tip_states = traits[[1]],
+             # transition_matrix = qmat,
+             Nstates = 2,
+             root_prior = "empirical", include_ancestral_likelihoods = T, reroot = F)$ancestral_likelihoods[1,]
+
