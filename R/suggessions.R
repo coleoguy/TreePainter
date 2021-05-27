@@ -54,7 +54,7 @@ treePaintR <- function(tree = NULL,
     if(nrow(qmat) != ncol(qmat)){
       stop("number of rows and columns in the Q Matrix does not match")
     }
-    if(any(rowSums(qmat) != 0)){
+    if(any(round(rowSums(qmat),10) != 0)){
       stop(paste("row(s)", which(rowSums(qmat) != 0), "does not add up to zero"))
     }
   }
