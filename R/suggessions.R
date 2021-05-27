@@ -181,7 +181,9 @@ treePaintR <- function(tree = NULL,
       deviation <- sd(lk.trace[(iter - iter.check.interval):iter])
     }
     if(deviation != 0){
+      if(verbose == T){
       print(paste("Performing additional iterations untill no increase in the likelihood is seen within", iter.check.interval, "iterations"))
+      }
       counter <- T
       while (counter) {
         result <- testNewRate(tree = tree, tip_states = tip_states,
@@ -202,7 +204,9 @@ treePaintR <- function(tree = NULL,
         }
         if(deviation == 0){
           counter <- F
+          if(verbose == T){
           print(paste("An additional number of ", j - iter, " iterations performed",sep = ""))
+          }
         }
       }
     }

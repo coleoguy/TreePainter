@@ -4,6 +4,10 @@ library(chromePlus)
 source("suggessions.R")
 
 qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
+qmat <- matrix(c(-.5,.2,.3,
+                 .2,-.5,.3,
+                 .3,.2,-.5), 3,3,byrow = T)
+# colnames(qmat) <- row.names(qmat) <- c(1,2)
 nTrees <- 1
 trees <- traits <- list()
 fast.branches <- list()
@@ -39,7 +43,7 @@ sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[
 #                                        pars = qmat,
 #                                        model = "mkn",x0 = 2))
 
-traits[[i]] <- simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
+traits[[i]] <- simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1,0),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
 
 # simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
 
@@ -58,10 +62,12 @@ if(length(unique(traits[[i]])) == 1){
   }
 }
 
+names(traits[[1]]) <- trees[[1]]$tip.label
+
 par(mfcol = c(1,2))
 
 plot(sim.tree, show.tip.label = F)
-tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
+tiplabels(pch = 16, col = c("red", "blue", "green")[traits[[1]]], cex = .5, offset = .01)
 
 # plot(x = NULL, y = NULL,
 #      xlim = c(1,10000),
@@ -86,9 +92,9 @@ tiplabels(pch = 16, col = c("red", "blue")[traits[[1]]], cex = .5, offset = .01)
 x <- treePaintR(tree = trees[[i]],
                 tip_states = traits[[i]],
                 qmat = qmat,
-                iter = 500,
+                iter = 5000,
                 rate.classes = 11,
-                step = .5,iter.check = T,
+                step = 0.1,iter.check = T,
                 iter.check.interval = 1000,
                 root_prior = "empirical")
 
@@ -137,9 +143,8 @@ fl
 # plot(rates)
 
 
-asr_mk_model(tree = trees[[1]],
+root <- asr_mk_model(tree = trees[[1]],
              tip_states = traits[[1]],
              # transition_matrix = qmat,
              Nstates = 2,
              root_prior = "empirical", include_ancestral_likelihoods = T, reroot = F)$ancestral_likelihoods[1,]
-
