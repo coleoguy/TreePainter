@@ -3,10 +3,12 @@ library(castor)
 library(chromePlus)
 source("suggessions.R")
 
-qmat <- matrix(c(-.3,.3,.3,-.3), 2,2)
-qmat <- matrix(c(-.5,.2,.3,
-                 .2,-.5,.3,
-                 .3,.2,-.5), 3,3,byrow = T)
+qmat <- matrix(c(-.3,.3,.3,-.3,.3,), 2,2)
+qmat <- matrix(c(-1.2,.3,.3,.3,.3,
+                 .3,-1.2,.3,.3,.3,
+                 .3,.3,-1.2,.3,.3,
+                 .3,.3,.3,-1.2,.3,
+                 .3,.3,.3,.3,-1.2), 5,5,byrow = T)
 # colnames(qmat) <- row.names(qmat) <- c(1,2)
 nTrees <- 1
 trees <- traits <- list()
@@ -17,8 +19,8 @@ for(i in 1:nTrees){
                       type="bd",
                       max.taxa = ntips[i])[[1]]
   # scale tree to unit length
-   # depth <- max(branching.times(trees[[i]]))
-   # trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
+    depth <- max(branching.times(trees[[i]]))
+    trees[[i]]$edge.length <- trees[[i]]$edge.length / depth
   working <- T
   counter <- 0
   while(working){
@@ -43,7 +45,7 @@ sim.tree$edge.length[fast.branches[[i]]] <- sim.tree$edge.length[fast.branches[[
 #                                        pars = qmat,
 #                                        model = "mkn",x0 = 2))
 
-traits[[i]] <- simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1,0),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
+traits[[i]] <- simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1,0,0,0),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
 
 # simulate_mk_model(tree = sim.tree, Q = qmat, root_probabilities = c(0,1),include_nodes = F,Nsimulations = 1,drop_dims = T)$tip_states
 
@@ -67,7 +69,7 @@ names(traits[[1]]) <- trees[[1]]$tip.label
 par(mfcol = c(1,2))
 
 plot(sim.tree, show.tip.label = F)
-tiplabels(pch = 16, col = c("red", "blue", "green")[traits[[1]]], cex = .5, offset = .01)
+tiplabels(pch = 16, col = rainbow(7)[traits[[1]]], cex = .5, offset = .01)
 
 # plot(x = NULL, y = NULL,
 #      xlim = c(1,10000),
@@ -93,7 +95,7 @@ x <- treePaintR(tree = trees[[i]],
                 tip_states = traits[[i]],
                 qmat = qmat,
                 iter = 5000,
-                rate.classes = 11,
+                rate.classes = 5,
                 step = 0.1,iter.check = T,
                 iter.check.interval = 1000,
                 root_prior = "empirical")
@@ -104,11 +106,11 @@ plot.rateTree(x$tree, rates = x$num.rates,edge.width = 1, scaled = F)
 # hist(x$tree$rates)
 
 # true positives
-th <- sum(x$tree$rates[fast.branches[[i]]]>= median(1:x$num.rates)) / length(fast.branches[[i]])
-tl <- sum(x$tree$rates[-fast.branches[[i]]] < median(1:x$num.rates)) / length(x$tree$rates[-fast.branches[[i]]])
+th <- sum(x$tree$rates[fast.branches[[1]]]> median(1:x$num.rates)) / length(fast.branches[[1]])
+tl <- sum(x$tree$rates[-fast.branches[[1]]] < median(1:x$num.rates)) / length(x$tree$rates[-fast.branches[[1]]])
 # false positives
-fh <- sum(x$tree$rates[-fast.branches[[i]]] >= median(1:x$num.rates)) / length(x$tree$rates[-fast.branches[[i]]])
-fl <- sum(x$tree$rates[fast.branches[[i]]] < median(1:x$num.rates)) / length(fast.branches[[i]])
+fh <- sum(x$tree$rates[-fast.branches[[1]]] > median(1:x$num.rates)) / length(x$tree$rates[-fast.branches[[1]]])
+fl <- sum(x$tree$rates[fast.branches[[1]]] < median(1:x$num.rates)) / length(fast.branches[[1]])
 
 th
 tl
@@ -146,5 +148,5 @@ fl
 root <- asr_mk_model(tree = trees[[1]],
              tip_states = traits[[1]],
              # transition_matrix = qmat,
-             Nstates = 2,
+             Nstates = ncol(qmat),
              root_prior = "empirical", include_ancestral_likelihoods = T, reroot = F)$ancestral_likelihoods[1,]
